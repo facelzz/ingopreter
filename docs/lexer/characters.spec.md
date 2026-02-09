@@ -6,7 +6,7 @@ ignored at the start of the source text and disallowed in other places.
 
 [Unicode 8.0.0 Standard Reference](https://www.unicode.org/versions/Unicode8.0.0/)
 
-## Characters
+## Characters ([src](https://go.dev/ref/spec#Characters))
 
 ```ebnf
 newline        = /* the Unicode code point U+000A */ .
@@ -19,7 +19,7 @@ By Unicode 8.0.0 Standard Section 4.5 character categories definition:
 - `Lu`, `Ll`, `Lt`, `Lm` and `Lo` as Letters
 - `Nd` as digits.
 
-## Letters and difits
+## Letters and digits ([src](https://go.dev/ref/spec#Letters_and_digits))
 
 ```ebnf
 letter        = unicode_letter | "_" .
