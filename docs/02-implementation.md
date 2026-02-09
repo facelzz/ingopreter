@@ -7,7 +7,7 @@ flowchart TD
     semanter["Semantic Analyser"]
     executor["Code Executor"]
     
-    lexer-->parser-->semanter-->executor
+    lexer-->|token stream|parser-->|syntax tree|semanter-->|syntax tree|executor
 ```
 
 # To start with
