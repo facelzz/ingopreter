@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"facelzz/ingopreter/lexer"
+	"facelzz/ingopreter/internal/lexer"
 	"log"
 	"os"
 	"strings"
