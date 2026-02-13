@@ -41,6 +41,17 @@ func Tokenize(chars []rune) []Token {
 			capturingToken = false
 		}
 	}
+	// capture non-closed token
+	if capturingToken {
+		slog.Debug("Word end!")
+
+		// Capture token
+		tokens = append(tokens, Token{
+			Value: string(chars[tokenStart:]),
+		})
+
+		capturingToken = false
+	}
 
 	if len(tokens) == 0 {
 		return nil
