@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"log"
+	"log/slog"
 	"unicode"
 )
 
@@ -9,26 +9,26 @@ type Token struct {
 	Value string
 }
 
-func Tokenize(chars []rune, verbose bool) []Token {
+// Tokenize TODO: line-by-line might no work because of multi-line tokens
+func Tokenize(chars []rune) []Token {
 	var tokens []Token // TODO: here's some random capacity
 
 	capturingToken := false
 	tokenStart := 0
 	for i, v := range chars {
-		if verbose {
-			log.Print("Char[", i, "]: ", v)
-		}
+		slog.Debug("processing rune",
+			"runeIndex", i,
+			"runeValue", string(v))
+
 		if !unicode.IsSpace(v) && !capturingToken {
-			if verbose {
-				log.Print("Word start!")
-			}
+			slog.Debug("Word start!")
+
 			capturingToken = true
 			continue
 		}
 		if unicode.IsSpace(v) && capturingToken {
-			if verbose {
-				log.Print("Word end!")
-			}
+			slog.Debug("Word end!")
+
 			// Capture token
 			tokens = append(tokens, Token{
 				Value: string(chars[tokenStart:i]),

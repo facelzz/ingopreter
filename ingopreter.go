@@ -3,31 +3,34 @@ package main
 import (
 	"errors"
 	"facelzz/ingopreter/internal/lexer"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
 )
 
 func main() {
+	setupLogging()
+
 	// get file name argument
 	filePath, err := getFilePath()
 	if err != nil {
-		log.Fatalln("ERROR:", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
-	verbose := getArg("-v")
-
 	// read file into the memory?
-	lines, err := readFileByLines(filePath, verbose)
+	lines, err := readFileByLines(filePath)
 	if err != nil {
-		log.Fatalln("ERROR:", err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	// lexer: tokenization, line by line
 	for _, line := range lines {
-		tokens := lexer.Tokenize([]rune(line), verbose)
+		tokens := lexer.Tokenize([]rune(line))
 		if tokens != nil {
-			log.Println(tokens)
+			slog.Info("line tokenized",
+				"tokens", tokens)
 		}
 	}
 
@@ -36,6 +39,18 @@ func main() {
 	// semantic analysis
 
 	// execution
+}
+
+func setupLogging() {
+	logLevel := slog.LevelInfo
+	verbose := getArg("-v")
+	if verbose {
+		logLevel = slog.LevelDebug
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: logLevel,
+	}))
+	slog.SetDefault(logger)
 }
 
 func getArg(agrName string) bool {
@@ -57,23 +72,19 @@ func getFilePath() (string, error) {
 	return filePath, nil
 }
 
-func readFileByLines(path string, verbose bool) ([]string, error) {
-	if verbose {
-		log.Println("File to read:", path)
-	}
+func readFileByLines(path string) ([]string, error) {
+	slog.Debug("reading file",
+		"path", path)
 
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	if verbose {
-		log.Println("Bytes:", bytes)
-	}
 	lines := strings.SplitAfter(string(bytes), "\n")
-	if verbose {
-		log.Println("Lines:", lines)
-	}
+	slog.Debug("reading file",
+		"bytes", bytes,
+		"lines", lines)
 
 	return lines, nil
 }
