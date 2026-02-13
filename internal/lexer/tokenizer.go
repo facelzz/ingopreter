@@ -20,12 +20,15 @@ func Tokenize(chars []rune) []Token {
 			"runeIndex", i,
 			"runeValue", string(v))
 
+		// capture token start
 		if !unicode.IsSpace(v) && !capturingToken {
 			slog.Debug("Word start!")
 
 			capturingToken = true
 			continue
 		}
+
+		// capture terminated token
 		if unicode.IsSpace(v) && capturingToken {
 			slog.Debug("Word end!")
 
