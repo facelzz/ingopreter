@@ -29,16 +29,19 @@ func Tokenize(chars []rune) []Token {
 		}
 
 		// capture terminated token
-		if unicode.IsSpace(v) && capturingToken {
-			slog.Debug("Word end!")
+		if unicode.IsSpace(v) {
+			if capturingToken {
+				slog.Debug("Word end!")
 
-			// Capture token
-			tokens = append(tokens, Token{
-				Value: string(chars[tokenStart:i]),
-			})
+				// Capture token
+				tokens = append(tokens, Token{
+					Value: string(chars[tokenStart:i]),
+				})
+			}
 
 			tokenStart = i + 1
 			capturingToken = false
+			continue
 		}
 	}
 	// capture non-closed token
