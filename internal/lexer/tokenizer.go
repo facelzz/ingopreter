@@ -187,6 +187,32 @@ func Tokenize(chars []rune) []Token {
 			i = j - 1
 			slog.Debug("identifier or keyword captured")
 
+		// starts with digit - numeric literal
+		case chsp(v, decimalDigit):
+			// greedily capture token
+			j := i + 1
+			for {
+				if j >= len(chars) ||
+					!chsp(chars[j], decimalDigit) &&
+						!chsp(chars[j], hexDigit) &&
+						// TODO: process exponent part
+						// TODO: process imaginary
+						chars[j] != '_' && chars[j] != '.' &&
+						chars[j] != 'b' && chars[j] != 'B' &&
+						chars[j] != 'o' && chars[j] != 'O' &&
+						chars[j] != 'x' && chars[j] != 'X' {
+					break
+				}
+				j++
+			}
+
+			// capture token
+			tokens = append(tokens, Token{
+				Value: string(chars[i:j]),
+			})
+			i = j - 1
+			slog.Debug("identifier or keyword captured")
+
 		// unexpected
 		default:
 			// Unknown
