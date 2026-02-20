@@ -115,3 +115,48 @@ string_lit             = raw_string_lit | interpreted_string_lit .
 raw_string_lit         = "`" { unicode_char | newline } "`" .
 interpreted_string_lit = `"` { unicode_value | byte_value } `"` .
 ```
+
+# Implementation
+
+Tokens can be grouped like:
+1. Single char tokens
+This tokens can be easilly identified because they are always (almost, see 
+comments) terminating by itself e.g.: `(`, `)`, `[`, `]`, `{`,
+`}`, `,`, `;`, `!`, `~`, `"`, `'`. These are some of opernators&punctuation.
+2. Continuous words
+Sequence of non-terminating and non-space chars. These are identifiers, keywords,
+and literals in simple non-validated representation.
+3. Complex tokens
+Sequence of chars that cannot be identifier as "continuous word" because of
+some sort of exceptions, e.g. strings with spaces or multi-char operators like
+`<-`, `*=`. This group also includes signle-char tokens that can't be identified
+clearly as "signle char token" by the first token, e.g. `*` can be multiplication
+or a first char of `*=` operation.
+
+> [!NOTE]
+> Should rune/string quotes be separate chars?
+> They are always in context of their context, but later we need to validate it.
+
+## Simple implementation
+
+Implement "Single char tokens" and "Continuous words" as is, make lookups
+(forward/backward) for "Complext tokens".
+
+This may work but implementation guaranteed to be messy and hard to read
+because of infinite "ifs".
+
+## Very simple implementation
+
+Use prioritised regexps :/
+
+This is not even interesing...
+
+## Very hard implementation
+
+Build a by-char spec graph. In reality this is just a "prioritied regexps"
+but with graph and handmade regexps :D
+
+Nodes of this directed graph are char spec and edges are links to the next and
+previous char specs.
+
+Do not know if it is possible though
