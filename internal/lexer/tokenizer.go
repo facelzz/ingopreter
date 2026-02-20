@@ -14,6 +14,16 @@ var singleCharTokens = []rune{
 	'(', ')', '[', ']', '{', '}', ',', ';', '!', '~', '"',
 }
 
+// c, c=
+var simpleAssignStart = []rune{
+	'!', '^', '/', ':', '=', '*', '%',
+}
+
+// c, cc, c=
+var simpleDoubleAssignStart = []rune{
+	'+', '-', '|',
+}
+
 // Tokenize TODO: line-by-line might no work because of multi-line tokens
 func Tokenize(chars []rune) []Token {
 	var tokens []Token // TODO: here's some random capacity
@@ -32,6 +42,127 @@ func Tokenize(chars []rune) []Token {
 				Value: string(chars[i : i+1]),
 			})
 			slog.Debug("single-char token captured")
+
+		// operators `c`, `c=`
+		case slices.Contains(simpleAssignStart, v):
+			if chars[i+1] == '=' {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+2]),
+				})
+				i += 1
+			} else {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+1]),
+				})
+			}
+			slog.Debug("operator/punctuation captured")
+
+		// operators `c`, `cc`, `c=`
+		case slices.Contains(simpleDoubleAssignStart, v):
+			if chars[i+1] == '=' || chars[i+1] == v {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+2]),
+				})
+				i += 1
+			} else {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+1]),
+				})
+			}
+			slog.Debug("operator/punctuation captured")
+
+		// &...
+		case v == '&':
+			if chars[i+1] == '^' {
+				if chars[i+2] == '=' {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+3]),
+					})
+					i += 2
+				} else {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+2]),
+					})
+				}
+			} else if chars[i+1] == '=' || chars[i+1] == v {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+2]),
+				})
+				i += 1
+			} else {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+1]),
+				})
+			}
+			slog.Debug("operator/punctuation captured")
+
+		// <...
+		case v == '<':
+			if chars[i+1] == v {
+				if chars[i+2] == '=' {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+3]),
+					})
+					i += 2
+				} else {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+2]),
+					})
+				}
+			} else if chars[i+1] == '=' || chars[i+1] == '-' {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+2]),
+				})
+				i += 1
+			} else {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+1]),
+				})
+			}
+			slog.Debug("operator/punctuation captured")
+
+		// >...
+		case v == '>':
+			if chars[i+1] == v {
+				if chars[i+2] == '=' {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+3]),
+					})
+					i += 2
+				} else {
+					tokens = append(tokens, Token{
+						Value: string(chars[i : i+2]),
+					})
+				}
+			} else if chars[i+1] == '=' {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+2]),
+				})
+				i += 1
+			} else {
+				tokens = append(tokens, Token{
+					Value: string(chars[i : i+1]),
+				})
+			}
+			slog.Debug("operator/punctuation captured")
+
+		// dots
+		case v == '.':
+			// ... greedy capture
+			j := i + 1
+			for {
+				if j >= len(chars) || chars[j] != '.' {
+					break
+				}
+				j++
+			}
+
+			// capture token
+			tokens = append(tokens, Token{
+				Value: string(chars[i:j]),
+			})
+			i = j - 1
+			slog.Debug("operator/punctuation captured")
 
 		// skip
 		case unicode.IsSpace(v):
