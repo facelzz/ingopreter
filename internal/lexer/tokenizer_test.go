@@ -32,6 +32,40 @@ func TestTokenize(t *testing.T) {
 				{"here"},
 			},
 		},
+		{
+			name: "captures operators and punctuation",
+			args: args{
+				chars: []rune(`some ("word") {
+					ch<-5
+					1>integer
+					2&^=5
+					arr[i]
+				}`),
+			},
+			want: []Token{
+				{"some"},
+				{"("},
+				{"\""},
+				{"word"},
+				{"\""},
+				{")"},
+				{"{"},
+				{"ch"},
+				{"<-"},
+				{"5"},
+				{"1"},
+				{">"},
+				{"integer"},
+				{"2"},
+				{"&^="},
+				{"5"},
+				{"arr"},
+				{"["},
+				{"i"},
+				{"]"},
+				{"}"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
