@@ -11,7 +11,7 @@ type Token struct {
 }
 
 var singleCharTokens = []rune{
-	'(', ')', '[', ']', '{', '}', ',', ';', '!', '~', '"',
+	'(', ')', '[', ']', '{', '}', ',', ';', '~', '"',
 }
 
 // c, c=
@@ -83,6 +83,7 @@ func Tokenize(chars []rune) []Token {
 					tokens = append(tokens, Token{
 						Value: string(chars[i : i+2]),
 					})
+					i += 1
 				}
 			} else if chars[i+1] == '=' || chars[i+1] == v {
 				tokens = append(tokens, Token{
@@ -108,6 +109,7 @@ func Tokenize(chars []rune) []Token {
 					tokens = append(tokens, Token{
 						Value: string(chars[i : i+2]),
 					})
+					i += 1
 				}
 			} else if chars[i+1] == '=' || chars[i+1] == '-' {
 				tokens = append(tokens, Token{
@@ -133,6 +135,7 @@ func Tokenize(chars []rune) []Token {
 					tokens = append(tokens, Token{
 						Value: string(chars[i : i+2]),
 					})
+					i += 1
 				}
 			} else if chars[i+1] == '=' {
 				tokens = append(tokens, Token{
