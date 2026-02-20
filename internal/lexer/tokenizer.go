@@ -31,121 +31,73 @@ func Tokenize(chars []rune) []Token {
 	var v rune
 	for i := 0; i < len(chars); i++ {
 		v = chars[i]
+		s := string(v)
 		slog.Debug("processing rune",
 			"runeIndex", i,
-			"runeValue", string(v))
+			"runeValue", s)
 
+		charsToCapture := 0
 		switch {
 		// single char token
 		case slices.Contains(singleCharTokens, v):
-			tokens = append(tokens, Token{
-				Value: string(chars[i : i+1]),
-			})
+			charsToCapture = 1
 			slog.Debug("single-char token captured")
 
 		// operators `c`, `c=`
 		case slices.Contains(simpleAssignStart, v):
+			charsToCapture = 1
 			if chars[i+1] == '=' {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+2]),
-				})
-				i += 1
-			} else {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+1]),
-				})
+				charsToCapture = 2
 			}
 			slog.Debug("operator/punctuation captured")
 
 		// operators `c`, `cc`, `c=`
 		case slices.Contains(simpleDoubleAssignStart, v):
+			charsToCapture = 1
 			if chars[i+1] == '=' || chars[i+1] == v {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+2]),
-				})
-				i += 1
-			} else {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+1]),
-				})
+				charsToCapture = 2
 			}
 			slog.Debug("operator/punctuation captured")
 
 		// &...
 		case v == '&':
+			charsToCapture = 1
 			if chars[i+1] == '^' {
 				if chars[i+2] == '=' {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+3]),
-					})
-					i += 2
+					charsToCapture = 3
 				} else {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+2]),
-					})
-					i += 1
+					charsToCapture = 2
 				}
 			} else if chars[i+1] == '=' || chars[i+1] == v {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+2]),
-				})
-				i += 1
-			} else {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+1]),
-				})
+				charsToCapture = 2
 			}
 			slog.Debug("operator/punctuation captured")
 
 		// <...
 		case v == '<':
+			charsToCapture = 1
 			if chars[i+1] == v {
 				if chars[i+2] == '=' {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+3]),
-					})
-					i += 2
+					charsToCapture = 3
 				} else {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+2]),
-					})
-					i += 1
+					charsToCapture = 2
 				}
 			} else if chars[i+1] == '=' || chars[i+1] == '-' {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+2]),
-				})
-				i += 1
-			} else {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+1]),
-				})
+				charsToCapture = 2
 			}
 			slog.Debug("operator/punctuation captured")
 
 		// >...
 		case v == '>':
+			charsToCapture = 1
 			if chars[i+1] == v {
 				if chars[i+2] == '=' {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+3]),
-					})
-					i += 2
+					charsToCapture = 3
 				} else {
-					tokens = append(tokens, Token{
-						Value: string(chars[i : i+2]),
-					})
-					i += 1
+					charsToCapture = 2
 				}
 			} else if chars[i+1] == '=' {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+2]),
-				})
-				i += 1
-			} else {
-				tokens = append(tokens, Token{
-					Value: string(chars[i : i+1]),
-				})
+				charsToCapture = 2
 			}
 			slog.Debug("operator/punctuation captured")
 
@@ -159,12 +111,7 @@ func Tokenize(chars []rune) []Token {
 				}
 				j++
 			}
-
-			// capture token
-			tokens = append(tokens, Token{
-				Value: string(chars[i:j]),
-			})
-			i = j - 1
+			charsToCapture = j - i
 			slog.Debug("operator/punctuation captured")
 
 		// skip
@@ -182,12 +129,7 @@ func Tokenize(chars []rune) []Token {
 				}
 				j++
 			}
-
-			// capture token
-			tokens = append(tokens, Token{
-				Value: string(chars[i:j]),
-			})
-			i = j - 1
+			charsToCapture = j - i
 			slog.Debug("identifier or keyword captured")
 
 		// starts with digit - numeric literal
@@ -208,18 +150,20 @@ func Tokenize(chars []rune) []Token {
 				}
 				j++
 			}
-
-			// capture token
-			tokens = append(tokens, Token{
-				Value: string(chars[i:j]),
-			})
-			i = j - 1
+			charsToCapture = j - i
 			slog.Debug("identifier or keyword captured")
 
 		// unexpected
 		default:
-			// Unknown
-			//panic("Unknown char: " + string(v))
+			panic("Unknown char: " + string(v))
+		}
+
+		// capture token
+		if charsToCapture > 0 {
+			tokens = append(tokens, Token{
+				Value: string(chars[i : i+charsToCapture]),
+			})
+			i += charsToCapture - 1
 		}
 	}
 
