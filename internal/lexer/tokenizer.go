@@ -118,7 +118,7 @@ func Tokenize(chars []rune) []Token {
 		case unicode.IsSpace(v):
 			slog.Debug("space skipped")
 
-		// starts with letter - identifier ar keywork
+		// starts with letter - identifier or keyword
 		// EBNF: identifier = letter { letter | unicode_digit } .
 		case chsp(v, letter):
 			// greedily capture token
