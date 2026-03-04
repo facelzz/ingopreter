@@ -8,6 +8,35 @@ import (
 
 type Token struct {
 	Value string
+	Type  TokenType
+}
+
+type TokenType int
+
+const (
+	Unknown TokenType = iota
+	Identifier
+	Keyword
+	Operator
+	Punctuation
+	Literal
+)
+
+func (t TokenType) String() string {
+	switch t {
+	case Identifier:
+		return "identifier"
+	case Keyword:
+		return "keyword"
+	case Operator:
+		return "operator"
+	case Punctuation:
+		return "punctuation"
+	case Literal:
+		return "literal"
+	default:
+		return "unknown"
+	}
 }
 
 var singleCharTokens = []rune{
@@ -24,6 +53,14 @@ var simpleDoubleAssignStart = []rune{
 	'+', '-', '|',
 }
 
+var keywords = []string{
+	"break", "default", "func", "interface", "select",
+	"case", "defer", "go", "map", "struct",
+	"chan", "else", "goto", "package", "switch",
+	"const", "fallthrough", "if", "range", "type",
+	"continue", "for", "import", "return", "var",
+}
+
 // Tokenize TODO: line-by-line might no work because of multi-line tokens
 func Tokenize(chars []rune) []Token {
 	var tokens []Token // TODO: here's some random capacity
@@ -37,10 +74,12 @@ func Tokenize(chars []rune) []Token {
 			"runeValue", s)
 
 		charsToCapture := 0
+		tokenType := Unknown
 		switch {
 		// single char token
 		case slices.Contains(singleCharTokens, v):
 			charsToCapture = 1
+			tokenType = Punctuation
 			slog.Debug("single-char token captured")
 
 		// operators `c`, `c=`
@@ -49,6 +88,7 @@ func Tokenize(chars []rune) []Token {
 			if chars[i+1] == '=' {
 				charsToCapture = 2
 			}
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// operators `c`, `cc`, `c=`
@@ -57,6 +97,7 @@ func Tokenize(chars []rune) []Token {
 			if chars[i+1] == '=' || chars[i+1] == v {
 				charsToCapture = 2
 			}
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// &...
@@ -71,6 +112,7 @@ func Tokenize(chars []rune) []Token {
 			} else if chars[i+1] == '=' || chars[i+1] == v {
 				charsToCapture = 2
 			}
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// <...
@@ -85,6 +127,7 @@ func Tokenize(chars []rune) []Token {
 			} else if chars[i+1] == '=' || chars[i+1] == '-' {
 				charsToCapture = 2
 			}
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// >...
@@ -99,6 +142,7 @@ func Tokenize(chars []rune) []Token {
 			} else if chars[i+1] == '=' {
 				charsToCapture = 2
 			}
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// dots
@@ -112,6 +156,7 @@ func Tokenize(chars []rune) []Token {
 				j++
 			}
 			charsToCapture = j - i
+			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
 
 		// skip
@@ -130,6 +175,11 @@ func Tokenize(chars []rune) []Token {
 				j++
 			}
 			charsToCapture = j - i
+			if slices.Contains(keywords, string(chars[i:i+charsToCapture])) {
+				tokenType = Keyword
+			} else {
+				tokenType = Identifier
+			}
 			slog.Debug("identifier or keyword captured")
 
 		// starts with digit - numeric literal
@@ -151,6 +201,7 @@ func Tokenize(chars []rune) []Token {
 				j++
 			}
 			charsToCapture = j - i
+			tokenType = Literal
 			slog.Debug("identifier or keyword captured")
 
 		// unexpected
@@ -162,6 +213,7 @@ func Tokenize(chars []rune) []Token {
 		if charsToCapture > 0 {
 			tokens = append(tokens, Token{
 				Value: string(chars[i : i+charsToCapture]),
+				Type:  tokenType,
 			})
 			i += charsToCapture - 1
 		}
