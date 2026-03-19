@@ -39,6 +39,7 @@ func (t TokenType) String() string {
 	}
 }
 
+// TODO: mabe use binary masks for it?
 var singleCharTokens = []rune{
 	'(', ')', '[', ']', '{', '}', ',', ';', '~', '"',
 }
@@ -68,6 +69,8 @@ func Tokenize(chars []rune) []Token {
 	var v rune
 	for i := 0; i < len(chars); i++ {
 		v = chars[i]
+		hasNext := i+1 < len(chars)
+		hasOverNext := i+2 < len(chars)
 		s := string(v)
 		slog.Debug("processing rune",
 			"runeIndex", i,
@@ -85,7 +88,7 @@ func Tokenize(chars []rune) []Token {
 		// operators `c`, `c=`
 		case slices.Contains(simpleAssignStart, v):
 			charsToCapture = 1
-			if chars[i+1] == '=' {
+			if hasNext && chars[i+1] == '=' {
 				charsToCapture = 2
 			}
 			tokenType = Operator
@@ -94,7 +97,7 @@ func Tokenize(chars []rune) []Token {
 		// operators `c`, `cc`, `c=`
 		case slices.Contains(simpleDoubleAssignStart, v):
 			charsToCapture = 1
-			if chars[i+1] == '=' || chars[i+1] == v {
+			if hasNext && (chars[i+1] == '=' || chars[i+1] == v) {
 				charsToCapture = 2
 			}
 			tokenType = Operator
@@ -103,14 +106,16 @@ func Tokenize(chars []rune) []Token {
 		// &...
 		case v == '&':
 			charsToCapture = 1
-			if chars[i+1] == '^' {
-				if chars[i+2] == '=' {
-					charsToCapture = 3
-				} else {
+			if hasNext {
+				if chars[i+1] == '^' {
+					if hasOverNext && chars[i+2] == '=' {
+						charsToCapture = 3
+					} else {
+						charsToCapture = 2
+					}
+				} else if chars[i+1] == '=' || chars[i+1] == v {
 					charsToCapture = 2
 				}
-			} else if chars[i+1] == '=' || chars[i+1] == v {
-				charsToCapture = 2
 			}
 			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
@@ -118,14 +123,16 @@ func Tokenize(chars []rune) []Token {
 		// <...
 		case v == '<':
 			charsToCapture = 1
-			if chars[i+1] == v {
-				if chars[i+2] == '=' {
-					charsToCapture = 3
-				} else {
+			if hasNext {
+				if chars[i+1] == v {
+					if hasOverNext && chars[i+2] == '=' {
+						charsToCapture = 3
+					} else {
+						charsToCapture = 2
+					}
+				} else if chars[i+1] == '=' || chars[i+1] == '-' {
 					charsToCapture = 2
 				}
-			} else if chars[i+1] == '=' || chars[i+1] == '-' {
-				charsToCapture = 2
 			}
 			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
@@ -133,14 +140,16 @@ func Tokenize(chars []rune) []Token {
 		// >...
 		case v == '>':
 			charsToCapture = 1
-			if chars[i+1] == v {
-				if chars[i+2] == '=' {
-					charsToCapture = 3
-				} else {
+			if hasNext {
+				if chars[i+1] == v {
+					if hasOverNext && chars[i+2] == '=' {
+						charsToCapture = 3
+					} else {
+						charsToCapture = 2
+					}
+				} else if chars[i+1] == '=' {
 					charsToCapture = 2
 				}
-			} else if chars[i+1] == '=' {
-				charsToCapture = 2
 			}
 			tokenType = Operator
 			slog.Debug("operator/punctuation captured")
