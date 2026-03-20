@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"log/slog"
 	"slices"
 	"unicode"
@@ -9,6 +10,10 @@ import (
 type Token struct {
 	Value string
 	Type  TokenType
+}
+
+func (t Token) String() string {
+	return fmt.Sprintf("%v(%v)", t.Value, t.Type.String())
 }
 
 type TokenType int
@@ -110,13 +115,14 @@ func Tokenize(chars []rune) []Token {
 		case v == '&':
 			charsToCapture = 1
 			if hasNext {
-				if chars[i+1] == '^' {
+				switch chars[i+1] {
+				case '^':
 					if hasOverNext && chars[i+2] == '=' {
 						charsToCapture = 3
 					} else {
 						charsToCapture = 2
 					}
-				} else if chars[i+1] == '=' || chars[i+1] == v {
+				case '=', v:
 					charsToCapture = 2
 				}
 			}
@@ -127,13 +133,14 @@ func Tokenize(chars []rune) []Token {
 		case v == '<':
 			charsToCapture = 1
 			if hasNext {
-				if chars[i+1] == v {
+				switch chars[i+1] {
+				case v:
 					if hasOverNext && chars[i+2] == '=' {
 						charsToCapture = 3
 					} else {
 						charsToCapture = 2
 					}
-				} else if chars[i+1] == '=' || chars[i+1] == '-' {
+				case '=', '-':
 					charsToCapture = 2
 				}
 			}
@@ -144,13 +151,14 @@ func Tokenize(chars []rune) []Token {
 		case v == '>':
 			charsToCapture = 1
 			if hasNext {
-				if chars[i+1] == v {
+				switch chars[i+1] {
+				case v:
 					if hasOverNext && chars[i+2] == '=' {
 						charsToCapture = 3
 					} else {
 						charsToCapture = 2
 					}
-				} else if chars[i+1] == '=' {
+				case '=':
 					charsToCapture = 2
 				}
 			}
