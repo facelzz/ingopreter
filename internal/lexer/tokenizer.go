@@ -92,6 +92,9 @@ func Tokenize(chars []rune) []Token {
 				charsToCapture = 2
 			}
 			tokenType = Operator
+			if charsToCapture == 1 && v == ':' {
+				tokenType = Punctuation
+			}
 			slog.Debug("operator/punctuation captured")
 
 		// operators `c`, `cc`, `c=`
