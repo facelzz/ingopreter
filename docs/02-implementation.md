@@ -2,13 +2,31 @@
 
 ```mermaid
 flowchart TD
-    lexer["Lexer (Lexical Analyzer)"]
+    subgraph lexer["Lexer (Lexical Analyzer)"]
+    end
     parser["Parser (Syntax Analyser)"]
     semanter["Semantic Analyser"]
     executor["Code Executor"]
     
     lexer-->|token stream|parser-->|syntax tree|semanter-->|syntax tree|executor
 ```
+
+## Lexer
+
+Lexer does lexical analysis which is a conversion of input stream into meaningfull
+lexical tokens with defined type.
+
+This process is done with two steps: Scanning and Evaluation.
+
+### Scanner
+
+This is usually a finite-state machine that captures stream characters into lexemes
+(pre-typed strings). As a note: string literal is a lexeme, so no "quote, text, quote"
+as separate lexemes in the output.
+
+### Evaluator
+
+TBD
 
 # To start with
 
