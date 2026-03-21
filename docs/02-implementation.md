@@ -3,6 +3,9 @@
 ```mermaid
 flowchart TD
     subgraph lexer["Lexer (Lexical Analyzer)"]
+        scanner["Scanner (Lexeme Extraction)"]
+        evaluator["Evaluator (Lexeme->Token Transformation)"]
+        scanner-->evaluator
     end
     parser["Parser (Syntax Analyser)"]
     semanter["Semantic Analyser"]
@@ -26,7 +29,7 @@ as separate lexemes in the output.
 
 ### Evaluator
 
-TBD
+This step is lexeme->token transformation. This really is just a data enrichment.
 
 # To start with
 
