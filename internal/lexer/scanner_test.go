@@ -233,6 +233,39 @@ func TestScan(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Literals",
+			cases: []testCase{
+				{
+					input: []rune(`some "string with 12 _ +$'" string`),
+					want: []Lexeme{
+						{"some", Identifier},
+						{"\"string with 12 _ +$'\"", Literal},
+						{"string", Identifier},
+					},
+				},
+				{
+					input: []rune("some 'v' rune"),
+					want: []Lexeme{
+						{"some", Identifier},
+						{"'v'", Literal},
+						{"rune", Identifier},
+					},
+				},
+				{
+					input: []rune("12 13.3 12_000 13.3e+12 23.4E+31 0x2p-1 0XfP+1"),
+					want: []Lexeme{
+						{"12", Literal},
+						{"13.3", Literal},
+						{"12_000", Literal},
+						{"13.3e+12", Literal},
+						{"23.4E+31", Literal},
+						{"0x2p-1", Literal},
+						{"0XfP+1", Literal},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
