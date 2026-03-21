@@ -27,7 +27,7 @@ func main() {
 
 	// lexer: tokenization, line by line
 	for _, line := range lines {
-		tokens := lexer.Tokenize([]rune(line))
+		tokens := lexer.Scan([]rune(line))
 		if tokens != nil {
 			slog.Info("line tokenized",
 				"tokens", tokens)

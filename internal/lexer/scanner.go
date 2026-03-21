@@ -7,12 +7,12 @@ import (
 	"unicode"
 )
 
-type Token struct {
+type Lexeme struct {
 	Value string
 	Type  TokenType
 }
 
-func (t Token) String() string {
+func (t Lexeme) String() string {
 	return fmt.Sprintf("%v(%v)", t.Value, t.Type.String())
 }
 
@@ -46,7 +46,7 @@ func (t TokenType) String() string {
 
 // TODO: mabe use binary masks for it?
 var singleCharTokens = []rune{
-	'(', ')', '[', ']', '{', '}', ',', ';', '~', '"',
+	'(', ')', '[', ']', '{', '}', ',', ';', '~',
 }
 
 // c, c=
@@ -67,9 +67,9 @@ var keywords = []string{
 	"continue", "for", "import", "return", "var",
 }
 
-// Tokenize TODO: line-by-line might no work because of multi-line tokens
-func Tokenize(chars []rune) []Token {
-	var tokens []Token // TODO: here's some random capacity
+// Scan TODO: line-by-line might no work because of multi-line tokens
+func Scan(chars []rune) []Lexeme {
+	var lexemes []Lexeme // TODO: here's some random capacity
 
 	var v rune
 	for i := 0; i < len(chars); i++ {
@@ -224,6 +224,24 @@ func Tokenize(chars []rune) []Token {
 			tokenType = Literal
 			slog.Debug("identifier or keyword captured")
 
+		// string literal
+		case v == '"':
+			// greedily capture token
+			j := i + 1
+			for {
+				if j >= len(chars) {
+					break
+				}
+				if chars[j] == '"' {
+					j++
+					break
+				}
+				j++
+			}
+			charsToCapture = j - i
+			tokenType = Literal
+			slog.Debug("string literal captured")
+
 		// unexpected
 		default:
 			panic("Unknown char: " + string(v))
@@ -231,7 +249,7 @@ func Tokenize(chars []rune) []Token {
 
 		// capture token
 		if charsToCapture > 0 {
-			tokens = append(tokens, Token{
+			lexemes = append(lexemes, Lexeme{
 				Value: string(chars[i : i+charsToCapture]),
 				Type:  tokenType,
 			})
@@ -239,9 +257,9 @@ func Tokenize(chars []rune) []Token {
 		}
 	}
 
-	if len(tokens) == 0 {
+	if len(lexemes) == 0 {
 		return nil
 	}
 
-	return tokens
+	return lexemes
 }

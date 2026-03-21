@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func TestTokenize(t *testing.T) {
+func TestScan(t *testing.T) {
 	type testCase struct {
 		input []rune
-		want  []Token
+		want  []Lexeme
 	}
 	tests := []struct {
 		name  string
@@ -28,7 +28,7 @@ func TestTokenize(t *testing.T) {
 			cases: []testCase{
 				{
 					input: []rune("some word\nhere"),
-					want: []Token{
+					want: []Lexeme{
 						{"some", Identifier},
 						{"word", Identifier},
 						{"here", Identifier},
@@ -41,195 +41,195 @@ func TestTokenize(t *testing.T) {
 			cases: []testCase{
 				{
 					input: []rune("+"),
-					want:  []Token{{"+", Operator}},
+					want:  []Lexeme{{"+", Operator}},
 				},
 				{
 					input: []rune("&"),
-					want:  []Token{{"&", Operator}},
+					want:  []Lexeme{{"&", Operator}},
 				},
 				{
 					input: []rune("+="),
-					want:  []Token{{"+=", Operator}},
+					want:  []Lexeme{{"+=", Operator}},
 				},
 				{
 					input: []rune("&="),
-					want:  []Token{{"&=", Operator}},
+					want:  []Lexeme{{"&=", Operator}},
 				},
 				{
 					input: []rune("&&"),
-					want:  []Token{{"&&", Operator}},
+					want:  []Lexeme{{"&&", Operator}},
 				},
 				{
 					input: []rune("=="),
-					want:  []Token{{"==", Operator}},
+					want:  []Lexeme{{"==", Operator}},
 				},
 				{
 					input: []rune("!="),
-					want:  []Token{{"!=", Operator}},
+					want:  []Lexeme{{"!=", Operator}},
 				},
 				{
 					input: []rune("("),
-					want:  []Token{{"(", Punctuation}},
+					want:  []Lexeme{{"(", Punctuation}},
 				},
 				{
 					input: []rune(")"),
-					want:  []Token{{")", Punctuation}},
+					want:  []Lexeme{{")", Punctuation}},
 				},
 				{
 					input: []rune("-"),
-					want:  []Token{{"-", Operator}},
+					want:  []Lexeme{{"-", Operator}},
 				},
 				{
 					input: []rune("|"),
-					want:  []Token{{"|", Operator}},
+					want:  []Lexeme{{"|", Operator}},
 				},
 				{
 					input: []rune("-="),
-					want:  []Token{{"-=", Operator}},
+					want:  []Lexeme{{"-=", Operator}},
 				},
 				{
 					input: []rune("|="),
-					want:  []Token{{"|=", Operator}},
+					want:  []Lexeme{{"|=", Operator}},
 				},
 				{
 					input: []rune("||"),
-					want:  []Token{{"||", Operator}},
+					want:  []Lexeme{{"||", Operator}},
 				},
 				{
 					input: []rune("<"),
-					want:  []Token{{"<", Operator}},
+					want:  []Lexeme{{"<", Operator}},
 				},
 				{
 					input: []rune("<="),
-					want:  []Token{{"<=", Operator}},
+					want:  []Lexeme{{"<=", Operator}},
 				},
 				{
 					input: []rune("["),
-					want:  []Token{{"[", Punctuation}},
+					want:  []Lexeme{{"[", Punctuation}},
 				},
 				{
 					input: []rune("]"),
-					want:  []Token{{"]", Punctuation}},
+					want:  []Lexeme{{"]", Punctuation}},
 				},
 				{
 					input: []rune("*"),
-					want:  []Token{{"*", Operator}},
+					want:  []Lexeme{{"*", Operator}},
 				},
 				{
 					input: []rune("^"),
-					want:  []Token{{"^", Operator}},
+					want:  []Lexeme{{"^", Operator}},
 				},
 				{
 					input: []rune("*="),
-					want:  []Token{{"*=", Operator}},
+					want:  []Lexeme{{"*=", Operator}},
 				},
 				{
 					input: []rune("^="),
-					want:  []Token{{"^=", Operator}},
+					want:  []Lexeme{{"^=", Operator}},
 				},
 				{
 					input: []rune("<-"),
-					want:  []Token{{"<-", Operator}},
+					want:  []Lexeme{{"<-", Operator}},
 				},
 				{
 					input: []rune(">"),
-					want:  []Token{{">", Operator}},
+					want:  []Lexeme{{">", Operator}},
 				},
 				{
 					input: []rune(">="),
-					want:  []Token{{">=", Operator}},
+					want:  []Lexeme{{">=", Operator}},
 				},
 				{
 					input: []rune("{"),
-					want:  []Token{{"{", Punctuation}},
+					want:  []Lexeme{{"{", Punctuation}},
 				},
 				{
 					input: []rune("}"),
-					want:  []Token{{"}", Punctuation}},
+					want:  []Lexeme{{"}", Punctuation}},
 				},
 				{
 					input: []rune("/"),
-					want:  []Token{{"/", Operator}},
+					want:  []Lexeme{{"/", Operator}},
 				},
 				{
 					input: []rune("<<"),
-					want:  []Token{{"<<", Operator}},
+					want:  []Lexeme{{"<<", Operator}},
 				},
 				{
 					input: []rune("/="),
-					want:  []Token{{"/=", Operator}},
+					want:  []Lexeme{{"/=", Operator}},
 				},
 				{
 					input: []rune("<<="),
-					want:  []Token{{"<<=", Operator}},
+					want:  []Lexeme{{"<<=", Operator}},
 				},
 				{
 					input: []rune("++"),
-					want:  []Token{{"++", Operator}},
+					want:  []Lexeme{{"++", Operator}},
 				},
 				{
 					input: []rune("="),
-					want:  []Token{{"=", Operator}},
+					want:  []Lexeme{{"=", Operator}},
 				},
 				{
 					input: []rune(":="),
-					want:  []Token{{":=", Operator}},
+					want:  []Lexeme{{":=", Operator}},
 				},
 				{
 					input: []rune(","),
-					want:  []Token{{",", Punctuation}},
+					want:  []Lexeme{{",", Punctuation}},
 				},
 				{
 					input: []rune(";"),
-					want:  []Token{{";", Punctuation}},
+					want:  []Lexeme{{";", Punctuation}},
 				},
 				{
 					input: []rune("%"),
-					want:  []Token{{"%", Operator}},
+					want:  []Lexeme{{"%", Operator}},
 				},
 				{
 					input: []rune(">>"),
-					want:  []Token{{">>", Operator}},
+					want:  []Lexeme{{">>", Operator}},
 				},
 				{
 					input: []rune("%="),
-					want:  []Token{{"%=", Operator}},
+					want:  []Lexeme{{"%=", Operator}},
 				},
 				{
 					input: []rune(">>="),
-					want:  []Token{{">>=", Operator}},
+					want:  []Lexeme{{">>=", Operator}},
 				},
 				{
 					input: []rune("--"),
-					want:  []Token{{"--", Operator}},
+					want:  []Lexeme{{"--", Operator}},
 				},
 				{
 					input: []rune("!"),
-					want:  []Token{{"!", Operator}},
+					want:  []Lexeme{{"!", Operator}},
 				},
 				{
 					input: []rune("..."),
-					want:  []Token{{"...", Operator}},
+					want:  []Lexeme{{"...", Operator}},
 				},
 				{
 					input: []rune("."),
-					want:  []Token{{".", Operator}},
+					want:  []Lexeme{{".", Operator}},
 				},
 				{
 					input: []rune(":"),
-					want:  []Token{{":", Punctuation}}, // todo: fix
+					want:  []Lexeme{{":", Punctuation}},
 				},
 				{
 					input: []rune("&^"),
-					want:  []Token{{"&^", Operator}},
+					want:  []Lexeme{{"&^", Operator}},
 				},
 				{
 					input: []rune("&^="),
-					want:  []Token{{"&^=", Operator}},
+					want:  []Lexeme{{"&^=", Operator}},
 				},
 				{
 					input: []rune("~"),
-					want:  []Token{{"~", Punctuation}},
+					want:  []Lexeme{{"~", Punctuation}},
 				},
 			},
 		},
@@ -238,8 +238,8 @@ func TestTokenize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for _, tc := range tt.cases {
-				if got := Tokenize(tc.input); !reflect.DeepEqual(got, tc.want) {
-					t.Errorf("Tokenize() = %v, want %v", got, tc.want)
+				if got := Scan(tc.input); !reflect.DeepEqual(got, tc.want) {
+					t.Errorf("Scan() = %v, want %v", got, tc.want)
 				}
 			}
 		})
