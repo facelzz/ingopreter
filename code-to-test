@@ -4,6 +4,7 @@ import "fmt"
 
 func main() {
 	result := 5 + 3*2/(1+int(1.0)) +0xff+0b0101 - 0o715
+	result += 2.3E+12 + 2.3e-12 + 0x_f.fP+1 0x_f.fp-1
 	fmt.Println(result)
 }
 

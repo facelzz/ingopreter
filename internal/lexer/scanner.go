@@ -206,16 +206,26 @@ func Scan(chars []rune) []Lexeme {
 		case chsp(v, decimalDigit):
 			// greedily capture token
 			j := i + 1
+			currChar := v
 			for {
-				if j >= len(chars) ||
-					!chsp(chars[j], decimalDigit) &&
-						!chsp(chars[j], hexDigit) &&
-						// TODO: process exponent part
-						// TODO: process imaginary
-						chars[j] != '_' && chars[j] != '.' &&
-						chars[j] != 'b' && chars[j] != 'B' &&
-						chars[j] != 'o' && chars[j] != 'O' &&
-						chars[j] != 'x' && chars[j] != 'X' {
+				if j >= len(chars) {
+					break
+				}
+				currChar = chars[j]
+				if currChar == 'p' || currChar == 'P' || currChar == 'e' || currChar == 'E' {
+					j++
+					if j < len(chars) && (chars[j] == '+' || chars[j] == '-') {
+						j++
+					}
+					continue
+				}
+				if !chsp(currChar, decimalDigit) &&
+					!chsp(currChar, hexDigit) &&
+					// TODO: process imaginary
+					currChar != '_' && currChar != '.' &&
+					currChar != 'b' && currChar != 'B' &&
+					currChar != 'o' && currChar != 'O' &&
+					currChar != 'x' && currChar != 'X' {
 					break
 				}
 				j++
@@ -233,7 +243,6 @@ func Scan(chars []rune) []Lexeme {
 					break
 				}
 				if chars[j] == '"' {
-					j++
 					break
 				}
 				j++
