@@ -245,11 +245,15 @@ func TestScan(t *testing.T) {
 					},
 				},
 				{
-					input: []rune("some 'v' rune"),
+					input: []rune(`'v' '\377' 'xFF' '\uF913' '\UF913F832' '\r' '\v'`),
 					want: []Lexeme{
-						{"some", Identifier},
 						{"'v'", Literal},
-						{"rune", Identifier},
+						{"'\\377'", Literal},
+						{"'xFF'", Literal},
+						{`'\uF913'`, Literal},
+						{`'\UF913F832'`, Literal},
+						{`'\r'`, Literal},
+						{`'\v'`, Literal},
 					},
 				},
 				{
