@@ -243,6 +243,7 @@ func Scan(chars []rune) []Lexeme {
 					break
 				}
 				if chars[j] == '"' {
+					j++
 					break
 				}
 				j++
