@@ -161,3 +161,4 @@ Nodes of this directed graph are char spec and edges are links to the next and
 previous char specs.
 
 Do not know if it is possible though
+
