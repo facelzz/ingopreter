@@ -225,7 +225,8 @@ func Scan(chars []rune) []Lexeme {
 					currChar != '_' && currChar != '.' &&
 					currChar != 'b' && currChar != 'B' &&
 					currChar != 'o' && currChar != 'O' &&
-					currChar != 'x' && currChar != 'X' {
+					currChar != 'x' && currChar != 'X' &&
+					currChar != 'i' {
 					break
 				}
 				j++
