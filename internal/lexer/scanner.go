@@ -267,10 +267,6 @@ func Scan(chars []rune) []Lexeme {
 				j++
 			}
 			charsToCapture = j - i
-			// TODO: add real rune validation
-			if charsToCapture > 3 {
-				slog.Error("scanner: invalid rune lit")
-			}
 			tokenType = Literal
 			slog.Debug("string literal captured")
 
